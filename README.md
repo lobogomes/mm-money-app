@@ -5,7 +5,7 @@
 </h1>
 
 <h3 align="center">
-    💰 a simple financial control app 💰
+    💸 a simple financial control app 💸
 </h3>
 
 <p align="center">
@@ -25,7 +25,7 @@
 </p>
 
 <h4 align="center">
-	  Concluded 🚀 
+	 🚧 In progress 🚀🚧
 </h4>
 
 ---
