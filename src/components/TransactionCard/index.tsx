@@ -11,29 +11,39 @@ import {
     Date
 } from "./styles";
 
-interface Category{
+interface Category {
     name: string;
     icon: string;
 }
 
-interface Props{
+export interface TransactionCardProps {
+
+    type: 'positive' | 'negative',
     title: string;
     value: string;
     category: Category,
     date: string;
+
 }
 
-export function TransactionCard({ title, value, category, date }: Props){
+interface Props {
+    data: TransactionCardProps
+}
+
+export function TransactionCard({ data }: Props) {
     return (
         <Container>
-            <Title>{title}</Title>
-            <Value>{value}</Value>
+            <Title>{data.title}</Title>
+            <Value type={data.type}>
+                {data.type === 'negative' && '- '}
+                {data.value}
+            </Value>
             <Footer>
                 <Category>
-                    <Icon name={category.icon} />
-                    <CategoryName>{category.name}</CategoryName>
+                    <Icon name={data.category.icon} />
+                    <CategoryName>{data.category.name}</CategoryName>
                 </Category>
-                <Date>{date}</Date>
+                <Date>{data.date}</Date>
             </Footer>
         </Container>
     )

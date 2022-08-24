@@ -5,6 +5,7 @@ export default{
 
         sucess: '#12A454',
         sucess_light: '#6FCF97',
+        sucess_opacy: 'rgba(18, 164, 84, 0.5)',
 
         attention: '#E83F5B' ,
         attention_light: 'rgba(232, 63, 91, 0.5)' ,
