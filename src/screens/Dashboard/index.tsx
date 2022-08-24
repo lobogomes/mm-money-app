@@ -1,4 +1,6 @@
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { Card } from "../../components/Cards";
 import { TransactionCard, TransactionCardProps } from "../../components/TransactionCard";
 import {
@@ -6,6 +8,7 @@ import {
     Container,
     Header,
     Icon,
+    Loading,
     Photo,
     Title,
     TransactionList,
@@ -16,102 +19,199 @@ import {
     UserName,
     UserWrapper,
 } from "./styles";
+import { ActivityIndicator } from "react-native";
 
 export interface DataListProps extends TransactionCardProps {
     id: string
 }
 
+interface CardsData {
+    earnings: { value: string, lastTransaction: string }
+    spendings: { value: string, lastTransaction: string }
+    balance: { value: string, lastTransaction: string, isNegative: boolean }
+}
+
 export function Dashboard() {
 
-    const data: DataListProps[] = [
-        {
-            id: '1',
-            type: 'positive',
-            title: "Lucro Bet",
-            value: "R$ 4.100,00",
-            category: {
-                name: 'Lucro',
-                icon: "ios-logo-bitcoin",
+    const [data, setData] = useState<DataListProps[]>([])
+    const [cardsData, setCardsData] = useState<CardsData>({} as CardsData)
+    const [isLoading, setIsLoading] = useState(true)
+
+
+    function getLastTransactionDate(
+        collection: DataListProps[],
+        type: 'positive' | 'negative'
+    ) {
+        const todayDateYear = (new Date()).getFullYear();
+
+        const dataArray = collection
+            .filter(transaction => transaction.type === type)
+            .map(transaction => new Date(transaction.date).getTime());
+
+        const lastTransaction = new Date(
+            Math.max.apply(Math, dataArray));
+
+        const lastTransactionYear = lastTransaction.getFullYear();
+
+        return dataArray.length === 0 ? '' : `${type === 'positive' ? 'Última entrada dia ' : 'Última saída dia '} ${lastTransaction.getDate()} de ${todayDateYear === lastTransactionYear ? lastTransaction.toLocaleString('pt-BR', { month: 'long' }) : lastTransaction.toLocaleString('pt-BR', { month: 'short' }) + ' de ' + lastTransactionYear}`;
+    }
+
+    function getTotalIntervalTransactionDate(
+        collection: DataListProps[],
+    ) {
+        const dateArray = collection.map(transaction => new Date(transaction.date).getTime());
+
+        const lastTransaction = new Date(Math.max.apply(Math, dateArray));
+
+        const lastTransactionFormmated = Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: 'short',
+        }).format(lastTransaction);
+
+        const firstTransaction = new Date(Math.min.apply(Math, dateArray));
+
+        const firstTransactionFormmated = Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: 'short',
+        }).format(firstTransaction);
+
+        const firstTransactionYear = firstTransaction.getFullYear();
+        const lastTransactionYear = lastTransaction.getFullYear();
+
+        return firstTransactionYear === lastTransactionYear
+            ? `${firstTransactionFormmated} ~ ${lastTransactionFormmated}`
+            : `${firstTransactionFormmated}. ${firstTransactionYear} ~ ${lastTransactionFormmated}. ${lastTransactionYear}`;
+    }
+
+    function convertToReal(value: number) {
+        const string = value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        return string.replace('R$', 'R$ ');
+    }
+
+
+    async function loadData() {
+
+        const dataKey = '@mmmoney:transactions'
+        const response = await AsyncStorage.getItem(dataKey)
+        const data = response ? JSON.parse(response) : []
+
+        let earnings = 0;
+        let spendings = 0;
+
+        const dataFormated: DataListProps[] = data.map((item: DataListProps) => {
+
+            if (item.type === 'positive') {
+                earnings += Number(item.value);
+            } else {
+                spendings += Number(item.value)
+            }
+
+            const value = convertToReal(Number(item.value));
+
+            const date = Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit', month: '2-digit', year: '2-digit'
+            }).format(new Date(item.date))
+
+            return {
+                id: item.id,
+                name: item.name,
+                value,
+                type: item.type,
+                category: item.category,
+                date
+            }
+        })
+
+        setData(dataFormated)
+
+        const lengthArray = data.length;
+
+        const lastTransactionEarnigs = lengthArray===0 ? '' : getLastTransactionDate(data, 'positive');
+        const lastTransactionSpendings = lengthArray===0 ? '' : getLastTransactionDate(data, 'negative');
+        const balanceInterval = lengthArray===0 ? '' : getTotalIntervalTransactionDate(data);
+    
+        const balance = earnings - spendings;
+        console.log("balance: " + balance)
+
+        setCardsData({
+            earnings: {
+                value: convertToReal(earnings),
+                lastTransaction: lastTransactionEarnigs
             },
-            date: "13/08/2022"
-        },
-        {
-            id: '2',
-            type: 'negative',
-            title: "Depósito Bet",
-            value: "R$ 2.000,00",
-            category: {
-                name: 'Contas',
-                icon: "ios-receipt-outline",
+            spendings:{ 
+                value: convertToReal(spendings),
+                lastTransaction: lastTransactionSpendings
             },
-            date: "13/08/2022"
-        },
-        {
-            id: '3',
-            type: 'negative',
-            title: "Pizzaria",
-            value: "R$ 150,00",
-            category: {
-                name: 'Alimentação',
-                icon: "ios-pizza-outline",
+            balance: {
+                value: convertToReal(balance),
+                lastTransaction: balanceInterval,
+                isNegative: balance < 0 ? true : false
             },
-            date: "13/08/2022"
-        },
-        {
-            id: '4',
-            type: 'positive',
-            title: "Investimento Amanda",
-            value: "R$ 5.000,00",
-            category: {
-                name: 'Investimento',
-                icon: "ios-bar-chart-outline",
-            },
-            date: "13/08/2022"
-        }
-    ]
+        })
+
+        console.log(dataFormated)
+        setIsLoading(false)
+    }
+
+    useEffect(() => { loadData() }, [])
+
+    useFocusEffect(useCallback(() => { loadData() }, []))
 
     return (
         <Container>
-            <Header>
+            {
+                isLoading ?
+                    <Loading><ActivityIndicator color="#000" /></Loading> :
+                    <>
+                        <Header>
 
-                <UserWrapper>
-                    <UserInfo>
-                        <Photo
-                            source={{ uri: 'https://avatars.githubusercontent.com/u/111708856?v=4' }} />
-                        <User>
-                            <UserGreeting>Olá,</UserGreeting>
-                            <UserName>Amanda</UserName>
-                        </User>
-                    </UserInfo>
-                    <Icon name='ios-power-outline' />
-                </UserWrapper>
+                            <UserWrapper>
+                                <UserInfo>
+                                    <Photo
+                                        source={{ uri: 'https://avatars.githubusercontent.com/u/111708856?v=4' }} />
+                                    <User>
+                                        <UserGreeting>Olá,</UserGreeting>
+                                        <UserName>Amanda</UserName>
+                                    </User>
+                                </UserInfo>
+                                <Icon name='ios-power-outline' />
+                            </UserWrapper>
 
-            </Header>
-            <Cards>
-                <Card title="Entradas"
-                    value="R$ 17.400,00"
-                    type="up"
-                    lastTransaction="Última entrada dia 13 de agosto" />
+                        </Header>
+                        <Cards>
+                            <Card title="Entradas"
+                                value={cardsData?.earnings?.value}
+                                type="up"
+                                isNegative={false}
+                                lastTransaction={cardsData?.earnings?.lastTransaction} />
 
-                <Card title="Saídas"
-                    value="R$ 8.500,00"
-                    type="down"
-                    lastTransaction="Última saída dia 14 de agosto" />
+                            <Card title="Saídas"
+                                value={cardsData?.spendings?.value}
+                                type="down"
+                                isNegative={false}
+                                lastTransaction={cardsData?.spendings?.lastTransaction} />
 
-                <Card title="Balanço"
-                    value="R$ 8.900,00"
-                    type="balance"
-                    lastTransaction="01 à 13 de agosto" />
-            </Cards>
-            <Transactions>
-                <Title>Transações</Title>
-                <TransactionList
-                    data={data}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => <TransactionCard data={item} />}
-                    
-                />
-            </Transactions>
+                            <Card title="Balanço"
+                                value={cardsData?.balance?.value}
+                                type="balance"
+                                isNegative={cardsData?.balance?.isNegative}
+                                lastTransaction={cardsData?.balance?.lastTransaction} />
+                        </Cards>
+                        <Transactions>
+                            <Title>Transações</Title>
+                            <TransactionList
+                                data={data}
+                                keyExtractor={item => item.id}
+                                renderItem={({ item }) => <TransactionCard data={item} />}
+
+                            />
+                        </Transactions>
+                    </>
+            }
         </Container>
     )
 }

@@ -14,18 +14,19 @@ interface Props {
     value: string;
     lastTransaction: string;
     type: 'up' | 'down' | 'balance'
+    isNegative: boolean
 }
 
 const icon = {
     up: "ios-arrow-up-circle-outline",
     down: "ios-arrow-down-circle-outline",
-    balance: "ios-logo-usd"
+    balance: "ios-analytics-outline"
 }
 
-export function Card({ type, title, value, lastTransaction }: Props) {
+export function Card({ type, title, value, lastTransaction, isNegative }: Props) {
 
     return (
-        <Container type={type}>
+        <Container type={type} isNegative={isNegative} >
             <Header>
                 <Title type={type}>{title}</Title>
                 <Icon name={icon[type]} type={type} />
