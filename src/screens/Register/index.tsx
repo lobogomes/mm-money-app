@@ -31,7 +31,10 @@ export function Register() {
         name: 'Categoria',
     })
     const [categoryModalOpen, setCategoryModalOpen] = useState(false)
-    const { control, handleSubmit } = useForm({
+    const { control, 
+        handleSubmit , 
+        formState: { errors }
+    } = useForm({
         resolver: yupResolver(schema)
     })
 
@@ -83,6 +86,7 @@ export function Register() {
                             placeholder="Descrição"
                             autoCapitalize="sentences"
                             autoCorrect={false}
+                            error={errors.name && errors.name.message}
                         />
 
                         <InputForm
@@ -90,6 +94,7 @@ export function Register() {
                             name="value"
                             placeholder="Valor"
                             keyboardType="numeric"
+                            error={errors.value && errors.value.message}
                         />
 
                         <TransactionTypeContainer>
