@@ -10,7 +10,8 @@ interface IconProps{
 
 interface ContainerProps{
     isActive: boolean,
-    type: 'up' | 'down'
+    type: 'up' | 'down',
+    title: string
 }
 
 export const Container = styled(TouchableOpacity)<ContainerProps>`
@@ -47,5 +48,5 @@ export const Icon = styled(Ionicons)<IconProps>`
 
 export const Title = styled.Text`
     font-family: ${({theme}) => theme.fonts.regular};
-    font-size: ${RFValue(14)}px;
+    font-size: ${RFValue(15)}px;
 `
