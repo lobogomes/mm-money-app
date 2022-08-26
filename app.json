@@ -1,8 +1,11 @@
 {
+  "name": "mm-money-app",
   "expo": {
     "name": "mm-money-app",
     "slug": "mm-money-app",
+    "scheme": "mm-money-app",
     "version": "1.0.0",
+    "owner": "lobogomes",
     "assetBundlePatterns": [
       "**/*"
     ],
