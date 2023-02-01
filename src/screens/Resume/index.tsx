@@ -56,7 +56,6 @@ export function Resume() {
     const theme = useTheme();
 
     function handleDateChange(action: 'next' | 'prev') {
-        console.log(action)
         if (action === 'next') {
             const today = new Date();
 

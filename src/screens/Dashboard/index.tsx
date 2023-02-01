@@ -9,6 +9,7 @@ import {
     Header,
     Icon,
     Loading,
+    LogoutButton,
     Photo,
     Title,
     TransactionList,
@@ -20,6 +21,7 @@ import {
     UserWrapper,
 } from "./styles";
 import { ActivityIndicator } from "react-native";
+import { useAuth } from "../../hooks/auth";
 
 export interface DataListProps extends TransactionCardProps {
     id: string
@@ -37,6 +39,7 @@ export function Dashboard() {
     const [cardsData, setCardsData] = useState<CardsData>({} as CardsData)
     const [isLoading, setIsLoading] = useState(true)
 
+    const {signOut} = useAuth()
 
     function getLastTransactionDate(
         collection: DataListProps[],
@@ -135,7 +138,6 @@ export function Dashboard() {
         const balanceInterval = lengthArray===0 ? '' : getTotalIntervalTransactionDate(data);
     
         const balance = earnings - spendings;
-        console.log("balance: " + balance)
 
         setCardsData({
             earnings: {
@@ -153,7 +155,6 @@ export function Dashboard() {
             },
         })
 
-        console.log(dataFormated)
         setIsLoading(false)
     }
 
@@ -178,7 +179,10 @@ export function Dashboard() {
                                         <UserName>Amanda</UserName>
                                     </User>
                                 </UserInfo>
-                                <Icon name='ios-power-outline' />
+                                <LogoutButton onPress={signOut}>
+                                    <Icon name='ios-power-outline' />
+                                </LogoutButton>
+                                
                             </UserWrapper>
 
                         </Header>

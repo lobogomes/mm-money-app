@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { getBottomSpace, getStatusBarHeight } from "react-native-iphone-x-helper";
 import { FlatList, FlatListProps } from "react-native";
 import { DataListProps } from ".";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 export const Container = styled.View`
     flex: 1;
@@ -56,6 +57,7 @@ export const UserName = styled.Text`
     font-size: ${RFValue(18)}px;
 
 `
+export const LogoutButton = styled(TouchableOpacity)``;
 
 export const Icon = styled(Ionicons)`
     color: ${({theme}) => theme.colors.shape};

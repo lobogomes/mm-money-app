@@ -20,6 +20,7 @@ interface AuthContextData {
     user: User;
     signInWithGoogle(): Promise<void>;
     signInWithApple(): Promise<void>;
+    signOut(): Promise<void>
 }
 
 interface AuthorizationResponse {
@@ -39,7 +40,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     const userStorageKey = '@mmmoney:user'
 
     async function signInWithGoogle() {
-        try {
+        /*try {
             const REDIRECT_URI = AuthSession.makeRedirectUri({ useProxy: true });
             const RESPONSE_TYPE = 'token'
             const SCOPE = encodeURI('profile email')
@@ -66,7 +67,13 @@ function AuthProvider({ children }: AuthProviderProps) {
 
             throw new Error()
 
-        }
+        }*/
+        setUser({
+            id: '1',
+            name: 'Amanda',
+            email: 'amanda@email',
+            
+        })
     }
 
     async function signInWithApple() {
@@ -93,20 +100,26 @@ function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
+    async function signOut() {
+        setUser( {} as User)
+        await AsyncStorage.removeItem(userStorageKey)
+    }
+
     useEffect(() => {}, [
-        async function loadUserStorageData() {
+        /*async function loadUserStorageData() {
             const userStorage = await AsyncStorage.getItem(userStorageKey)
             if(userStorage){
                 const userLogged = JSON.parse(userStorage) as User;
                 setUser(userLogged)
             }
-        }
+        }*/AsyncStorage.removeItem(userStorageKey)
     ])
     return (
         <AuthContext.Provider value={{
             user,
             signInWithGoogle,
-            signInWithApple
+            signInWithApple,
+            signOut
         }}>
             {children}
         </AuthContext.Provider>

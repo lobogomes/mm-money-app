@@ -15,6 +15,7 @@ import AppLoading from 'expo-app-loading';
 import { Routes } from './src/routes/index';
 import { StatusBar } from "react-native";
 import { AuthProvider, useAuth } from './src/hooks/auth';
+import { SignIn } from "./src/screens/SignIn";
 
 export default function App() {
 
