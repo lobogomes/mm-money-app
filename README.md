@@ -43,17 +43,17 @@
 The application layout is available in Figma:
 
 <p align="center">
-	<a href="https://www.figma.com/file/HKH9EMB1s2ckdzp0H1ZWv0/mm-money?node-id=0%3A1">
+	<a href="https://www.figma.com/file/lKNiWA8DsIpbYZqkdhzo1m/mm-money-app?node-id=0%3A1">
   	<img alt="Made by amandalobo" src="https://img.shields.io/badge/Acessar%20Layout%20-Figma-%2304D361">
 	</a>
 </p>
 
 
 <p align="center" style="display: flex; align-items: flex-start; justify-content: center;">
-  <img alt="mm money" title="mm money" src="/assets/Início.svg" height="400px">
-  <img alt="mm money" title="mm money" src="/assets/Home.svg" height="400px">
-  <img alt="mm money" title="mm money" src="/assets/Cadastro.svg" height="400px">
-  <img alt="mm money" title="mm money" src="/assets/Resumo.svg" height="400px">
+  <img alt="mm money" title="mm money" src="src/assets/Início.svg" height="400px">
+  <img alt="mm money" title="mm money" src="src/assets/Home.svg" height="400px">
+  <img alt="mm money" title="mm money" src="src/assets/Cadastro.svg" height="400px">
+  <img alt="mm money" title="mm money" src="src/assets/Resumo.svg" height="400px">
 </p>
 
 ---
